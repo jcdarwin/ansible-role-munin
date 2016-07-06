@@ -1,0 +1,58 @@
+---
+# ===============================================================
+# apache: configure apache
+# ===============================================================
+
+- include_vars: "defaults/main.yml"
+  tags: apache
+
+- name: Configure the virtual host with our environment
+  action: template
+    src=templates/munin.apache.conf.j2
+    dest=/etc/apache2/sites-available/munin.apache.conf
+    mode=0644
+  tags: apache
+
+- name: Create our htpasswd file
+  htpasswd: path=/etc/apache2/munin-users
+    name={{ ansible_role_munin.user }}
+    password={{ ansible_role_munin.password }}
+    owner=root
+    group=www-data
+    mode=0640
+  tags: apache
+
+- name: Activate apache modules
+  action: command a2enmod {{ item }}
+  notify:
+    - restart apache
+  with_items:
+    - rewrite
+    - cgi
+    - fcgid
+  tags: apache
+
+- name: Ensure our log directory exists
+  file: path=/var/log/apache2/{{ ansible_role_munin.hostname }}/
+    state=directory
+  tags: apache
+
+- name: Activate our virtualhost
+  action: command a2ensite munin.apache.conf
+  tags: apache
+
+- name: Check that our config is valid
+  action: command apache2ctl configtest
+  register: result
+  ignore_errors: True
+  tags: apache
+
+- name: Rolling back - Removing our virtualhost
+  action: command a2dissite munin.apache.conf
+  when: result|failed
+  tags: apache
+
+- name: Rolling back - Ending playbook
+  action: fail msg="Configuration file is not valid. Please check using 'apache2ctl configtest' before re-running the playbook."
+  when: result|failed
+  tags: apache

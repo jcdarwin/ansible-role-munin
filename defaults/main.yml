@@ -1,0 +1,14 @@
+---
+# defaults file for ansible-role-munin
+
+site:
+  app: site
+  host: localhost.vagrant
+  user: administrator
+  password: whatever
+
+ansible_role_munin:
+  hostname: munin.{{ site.host }}
+  docroot: /var/cache/munin/www
+  user: "{{ site.user }}"
+  password: "{{ site.password }}"

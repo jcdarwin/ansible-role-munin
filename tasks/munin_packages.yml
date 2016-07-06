@@ -1,0 +1,21 @@
+---
+# ===============================================================
+# packages: install the necessary packages
+# ===============================================================
+
+- name: Install packages
+  apt: pkg={{ item }} state=installed
+  with_items:
+    - software-properties-common
+    - python-software-properties
+    - libcache-perl
+    - libcache-cache-perl
+    - libwww-perl
+    - python-passlib
+    - libcgi-fast-perl
+    - libapache2-mod-fcgid
+    - php7.0-cgi
+    - munin
+    - munin-node
+    - munin-plugins-extra
+  tags: packages

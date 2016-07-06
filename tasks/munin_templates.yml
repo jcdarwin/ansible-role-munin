@@ -1,0 +1,55 @@
+---
+# ===============================================================
+# templates: install munin templates
+# ===============================================================
+
+- include_vars: "defaults/main.yml"
+  tags: templates
+
+- name: Backup default templates
+  command: cp -r /etc/munin/templates /etc/munin/templates_default
+  tags: templates
+
+- name: Backup default static
+  command: cp -r /etc/munin/static /etc/munin/static_default
+  tags: templates
+
+- name: Clone munstrap
+  git: repo=https://github.com/munin-monitoring/contrib.git
+       dest=/etc/munin/munstrap
+  tags: templates
+
+- name: Link in the munstrap templates
+  file:
+    src=/etc/munin/contrib/templates/munstrap/templates
+    dest=/etc/munin/templates
+    state=link
+  tags: templates
+
+- name: Link in munstrap static
+  file:
+    src=/etc/munin/contrib/templates/munstrap/static
+    dest=/etc/munin/static
+    state=link
+  tags: templates
+
+- name: Set html_strategy to cron
+  lineinfile:
+    dest=/etc/munin/munin.conf
+    line="html_strategy cron"
+    regexp="^html_strategy"
+    state=present
+  tags: templates
+
+# /usr/share/munin/munin-html --debug
+- name: Compile the templates
+  command: su - munin -s "/usr/share/munin/munin-html"
+  tags: templates
+
+- name: Set html_strategy back to cgi
+  lineinfile:
+    dest=/etc/munin/munin.conf
+    line="html_strategy cgi"
+    regexp="^html_strategy"
+    state=present
+  tags: templates

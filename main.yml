@@ -1,0 +1,15 @@
+---
+# This Playbook deploys munin!
+
+- hosts: all
+  remote_user: root
+  become: true
+  become_user: root
+  handlers:
+   - include: handlers/main.yml
+
+  tasks:
+  - include: tasks/munin_packages.yml
+  - include: tasks/munin_configure.yml
+  - include: tasks/munin_templates.yml
+  - include: tasks/munin_apache.yml

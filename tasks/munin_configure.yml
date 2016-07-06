@@ -1,0 +1,44 @@
+---
+# ===============================================================
+# configure: configure munin
+# ===============================================================
+
+- name: Configure munin
+  lineinfile: >
+    destfile=/etc/munin/munin.conf
+    regexp="html_strategy"
+    line="html_strategy cgi"
+    state=present
+  tags: configure
+
+# http://guide.munin-monitoring.org/en/latest/reference/munin-node-configure.html
+- name: Enable munin plugins
+  command: munin-node-configure --shell | sh
+  ignore_errors: yes
+  notify:
+    - restart munin-node
+  tags: configure
+
+# http://articles.slicehost.com/2010/4/9/enabling-munin-node-plug-ins-on-ubuntu
+- name: Link in extra plugins that we know we may need
+  file:
+    src=/usr/share/munin/plugins/{{ item }}
+    dest=/etc/munin/plugins/{{ item }}
+    state=link
+  with_items:
+    - apache_accesses
+    - apache_processes
+    - apache_volume
+    - http_loadtime
+    - mysql_
+    - mysql_bytes
+    - mysql_queries
+    - mysql_slowqueries
+    - mysql_threads
+    - tomcat_
+    - tomcat_access
+    - tomcat_jvm
+    - tomcat_threads
+    - tomcat_volume
+    - varnish_
+  tags: templates
