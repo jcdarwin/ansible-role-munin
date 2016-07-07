@@ -76,7 +76,7 @@ Running the playbook:
     ansible-playbook -l all main.yml -i ../vagrant/ansible/hosts
 
     # Check that php has been installed
-    ansible -m shell -a 'munin -V' all -i ../vagrant/ansible/hosts
+    ansible -m shell -a 'sudo munin-node-configure --shell' all -i ../vagrant/ansible/hosts
 
 To see the results in the browser (presuming you're using the defaults):
 
