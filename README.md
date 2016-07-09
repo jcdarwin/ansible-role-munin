@@ -18,10 +18,16 @@ Preusming a `requirements.yml` as follows:
     - name: ansible-role-munin
     src: https://github.com/jcdarwin/ansible-role-munin
 
-we can install the role locally:
+We can install the role locally, using a `requirements.yml` file:
+
+    # Install a role from GitHub
+    - name: ansible-role-munin
+    src: https://github.com/jcdarwin/ansible-role-munin
+    path: roles/
+
+Install the role:
 
     ansible-galaxy install -r requirements.yml -p ./roles
-
 
 Requirements
 ------------
