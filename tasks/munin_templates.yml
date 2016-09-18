@@ -19,16 +19,24 @@
        dest=/etc/munin/munstrap
   tags: templates
 
+- name: Remove default templates
+  command: rm -r /etc/munin/templates
+  tags: templates
+
 - name: Link in the munstrap templates
   file:
-    src=/etc/munin/contrib/templates/munstrap/templates
+    src=/etc/munin/munstrap/templates/munstrap/templates
     dest=/etc/munin/templates
     state=link
   tags: templates
 
+- name: Remove default static templates
+  command: rm -r /etc/munin/static
+  tags: templates
+
 - name: Link in munstrap static
   file:
-    src=/etc/munin/contrib/templates/munstrap/static
+    src=/etc/munin/munstrap/templates/munstrap/static
     dest=/etc/munin/static
     state=link
   tags: templates
