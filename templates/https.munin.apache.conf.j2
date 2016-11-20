@@ -1,0 +1,119 @@
+<VirtualHost *:80>
+	ServerName {{ ansible_role_munin.hostname }}
+	ServerAlias munin
+
+	DocumentRoot {{ ansible_role_munin.docroot }}
+
+	<IfModule mod_rewrite.c>
+		RewriteEngine On
+
+		RewriteCond %{REQUEST_URI} !^/.well-known/.* [NC]
+		RewriteRule / https://{{ ansible_role_munin.hostname }}/ [QSA,NC,R=301]
+	</IfModule>
+
+	# Allow certbot access to confirm the domain
+	<Directory {{ ansible_role_munin.docroot }}/.well-known>
+		Require all granted
+	</Directory>
+
+	ErrorLog  /var/log/apache2/{{ ansible_role_munin.hostname }}/error.log
+	CustomLog /var/log/apache2/{{ ansible_role_munin.hostname }}/access.log combined
+</VirtualHost>
+
+<VirtualHost *:443>
+	ServerName {{ ansible_role_munin.hostname }}
+	ServerAlias munin
+
+	DocumentRoot {{ ansible_role_munin.docroot }}
+
+	<IfModule mod_rewrite.c>
+		RewriteEngine On
+
+		#RewriteLog "/var/log/apache2/{{ ansible_role_munin.hostname }}-rewrite.log"
+		#RewriteLogLevel 3
+
+		# Static files
+		RewriteRule ^/favicon.ico /etc/munin/static/favicon.ico [L]
+		RewriteRule ^/static/(.*) /etc/munin/static/$1          [L]
+
+		# Certbot
+		RewriteCond %{REQUEST_URI} ^/.well-known/.* [NC]
+		RewriteRule ^/(.*)          {{ ansible_role_munin.docroot }}/$1 [L]
+
+		# HTML
+		RewriteCond %{REQUEST_URI} .html$ [or]
+		RewriteCond %{REQUEST_URI} =/
+		RewriteRule ^/(.*)          /usr/lib/munin/cgi/munin-cgi-html/$1 [L]
+
+		# Images
+		RewriteRule ^/munin-cgi/munin-cgi-graph/(.*) /$1
+		RewriteCond %{REQUEST_URI}                 !^/static
+		#RewriteCond %{REQUEST_URI}                 .png$
+		RewriteRule ^/(.*)          /usr/lib/munin/cgi/munin-cgi-graph/$1 [L]
+	</IfModule>
+
+	<Directory /etc/munin/static>
+		# For Apache 2.2:
+		# Order allow,deny
+		# Allow from all
+		Options None
+		AllowOverride None
+		AuthUserFile /etc/apache2/munin-users
+		AuthName "Munin"
+		AuthType Basic
+		require valid-user
+	</Directory>
+
+	<Directory {{ ansible_role_munin.docroot }}>
+		# For Apache 2.2:
+		# Order allow,deny
+		# Allow from all
+		Options None
+		AllowOverride None
+		AuthUserFile /etc/apache2/munin-users
+		AuthName "Munin"
+		AuthType Basic
+		Require valid-user
+		<ifmodule mod_expires.c="">
+				ExpiresActive On
+				ExpiresDefault M310
+		</ifmodule>
+	</Directory>
+
+	# Note that we also need to define a location block to allow the zoomed-in graphs
+	# be generated as mentioned at http://alexschroeder.ch/wiki/Kallobombus_Munin
+	ScriptAlias /munin-cgi/munin-cgi-graph /usr/lib/munin/cgi/munin-cgi-graph
+	<Location /munin-cgi/munin-cgi-graph>
+		# For Apache 2.2:
+		# Order allow,deny
+		# Allow from localhost 127.0.0.0/8 ::1
+		# Allow from all
+		AuthUserFile /etc/apache2/munin-users
+		AuthName "Munin"
+		AuthType Basic
+		Require valid-user
+		<IfModule mod_fcgid.c>
+			SetHandler fcgid-script
+		</IfModule>
+	</Location>
+
+	# Ensure we can run (fast)cgi scripts
+	<Directory "/usr/lib/munin/cgi">
+		Options +ExecCGI
+		# For Apache 2.2:
+		# Allow from all
+		AuthUserFile /etc/apache2/munin-users
+		AuthName "Munin"
+		AuthType Basic
+		Require valid-user
+		<IfModule mod_fcgid.c>
+			SetHandler fcgid-script
+		</IfModule>
+		<IfModule !mod_fcgid.c>
+			SetHandler cgi-script
+		</IfModule>
+	</Directory>
+
+	ErrorLog  /var/log/apache2/{{ ansible_role_munin.hostname }}/error.log
+	CustomLog /var/log/apache2/{{ ansible_role_munin.hostname }}/access.log combined
+</VirtualHost>

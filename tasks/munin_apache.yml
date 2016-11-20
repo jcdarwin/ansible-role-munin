@@ -6,12 +6,22 @@
 - include_vars: "defaults/main.yml"
   tags: apache
 
-- name: Configure the virtual host with our environment
+- name: Configure the virtual host with our environment for http
   action: template
-    src=templates/munin.apache.conf.j2
+    src=templates/http.munin.apache.conf.j2
     dest=/etc/apache2/sites-available/munin.apache.conf
     mode=0644
+  when: scheme != "https"
   tags: apache
+
+- name: Configure the virtual host with our environment for https
+  action: template
+    src=templates/https.munin.apache.conf.j2
+    dest=/etc/apache2/sites-available/munin.apache.conf
+    mode=0644
+  when: scheme == "https"
+  tags: apache
+
 
 - name: Create our htpasswd file
   htpasswd: path=/etc/apache2/munin-users

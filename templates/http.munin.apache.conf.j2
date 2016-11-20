@@ -4,9 +4,6 @@
 
 	DocumentRoot {{ ansible_role_munin.docroot }}
 
-	ErrorLog  /var/log/apache2/{{ ansible_role_munin.hostname }}/error.log
-	CustomLog /var/log/apache2/{{ ansible_role_munin.hostname }}/access.log combined
-
 	<IfModule mod_rewrite.c>
 		RewriteEngine On
 
@@ -16,6 +13,10 @@
 		# Static files
 		RewriteRule ^/favicon.ico /etc/munin/static/favicon.ico [L]
 		RewriteRule ^/static/(.*) /etc/munin/static/$1          [L]
+
+		# Certbot
+		RewriteCond %{REQUEST_URI} ^/.well-known/.* [NC]
+		RewriteRule ^/(.*)          {{ ansible_role_munin.docroot }}/$1 [L]
 
 		# HTML
 		RewriteCond %{REQUEST_URI} .html$ [or]
@@ -57,6 +58,10 @@
 		</ifmodule>
 	</Directory>
 
+	<Directory {{ ansible_role_munin.docroot }}/.well-known>
+		Require all granted
+	</Directory>
+
 	# Note that we also need to define a location block to allow the zoomed-in graphs
     # be generated as mentioned at http://alexschroeder.ch/wiki/Kallobombus_Munin
 	ScriptAlias /munin-cgi/munin-cgi-graph /usr/lib/munin/cgi/munin-cgi-graph
@@ -91,4 +96,6 @@
 		</IfModule>
 	</Directory>
 
+	ErrorLog  /var/log/apache2/{{ ansible_role_munin.hostname }}/error.log
+	CustomLog /var/log/apache2/{{ ansible_role_munin.hostname }}/access.log combined
 </VirtualHost>

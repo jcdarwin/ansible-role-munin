@@ -81,8 +81,19 @@ Running the playbook:
 
     ansible-playbook -l all main.yml -i ../vagrant/ansible/hosts
 
-    # Check that php has been installed
+    # Check that munin has been installed
     ansible -m shell -a 'sudo munin-node-configure --shell' all -i ../vagrant/ansible/hosts
+
+If you want to enable ssl using certbot:
+
+    # Manually, on the server:
+    /opt/certbot/certbot-auto certonly --webroot -w /var/cache/munin/www/ -d munin.whatever.co.nz
+
+    # This should result in a cert installed at:
+    /etc/letsencrypt/live/munin.whatever.co.nz/fullchain.pem
+
+    # Run our playbook to install munin using port 80 and port 443
+    ansible-playbook -l all main.yml -i ../vagrant/ansible/hosts --extra-vars "scheme=https"
 
 To see the results in the browser (presuming you're using the defaults):
 
