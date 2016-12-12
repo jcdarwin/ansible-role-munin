@@ -4,6 +4,11 @@
 
 	DocumentRoot {{ ansible_role_munin.docroot }}
 
+	# Allow certbot access to confirm the domain
+	<Directory {{ ansible_role_munin.docroot }}/.well-known>
+		Require all granted
+	</Directory>
+
 	<IfModule mod_rewrite.c>
 		RewriteEngine On
 
