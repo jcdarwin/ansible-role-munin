@@ -114,6 +114,11 @@
 		</IfModule>
 	</Directory>
 
+	SSLCertificateFile /etc/letsencrypt/live/{{ ansible_role_munin.hostname }}/cert.pem
+	SSLCertificateKeyFile /etc/letsencrypt/live/{{ ansible_role_munin.hostname }}/privkey.pem
+	Include /opt/certbot/certbot-apache/certbot_apache/options-ssl-apache.conf
+	SSLCertificateChainFile /etc/letsencrypt/live/{{ ansible_role_munin.hostname }}/chain.pem
+
 	ErrorLog  /var/log/apache2/{{ ansible_role_munin.hostname }}/error.log
 	CustomLog /var/log/apache2/{{ ansible_role_munin.hostname }}/access.log combined
 </VirtualHost>
