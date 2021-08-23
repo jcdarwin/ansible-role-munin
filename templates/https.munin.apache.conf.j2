@@ -7,7 +7,7 @@
 	<IfModule mod_rewrite.c>
 		RewriteEngine On
 
-		RewriteCond %{REQUEST_URI} !^/.well-known/.* [NC]
+		RewriteCond %{HTTP_URI} !^/.well-known/.* [NC]
 		RewriteRule / https://{{ ansible_role_munin.hostname }}/ [QSA,NC,R=301]
 	</IfModule>
 
@@ -29,16 +29,13 @@
 	<IfModule mod_rewrite.c>
 		RewriteEngine On
 
-		#RewriteLog "/var/log/apache2/{{ ansible_role_munin.hostname }}-rewrite.log"
-		#RewriteLogLevel 3
-
 		# Static files
 		RewriteRule ^/favicon.ico /etc/munin/static/favicon.ico [L]
 		RewriteRule ^/static/(.*) /etc/munin/static/$1          [L]
 
 		# Certbot
-		RewriteCond %{REQUEST_URI} ^/.well-known/.* [NC]
-		RewriteRule ^/(.*)          {{ ansible_role_munin.docroot }}/$1 [L]
+		RewriteCond %{HTTP_URI} ^/.well-known/.* [NC]
+		RewriteRule ^/(.*)          /var/cache/munin/www/$1 [L]
 
 		# HTML
 		RewriteCond %{REQUEST_URI} .html$ [or]
@@ -74,9 +71,9 @@
 		AuthName "Munin"
 		AuthType Basic
 		Require valid-user
-		<ifmodule mod_expires.c="">
-				ExpiresActive On
-				ExpiresDefault M310
+		<ifmodule mod_expires.c>
+			ExpiresActive On
+			ExpiresDefault M310
 		</ifmodule>
 	</Directory>
 
@@ -114,10 +111,10 @@
 		</IfModule>
 	</Directory>
 
-	SSLCertificateFile /etc/letsencrypt/live/{{ ansible_role_munin.hostname }}/cert.pem
-	SSLCertificateKeyFile /etc/letsencrypt/live/{{ ansible_role_munin.hostname }}/privkey.pem
+	SSLCertificateFile /etc/letsencrypt/live/munin.journalsurf.co.nz/cert.pem
+	SSLCertificateKeyFile /etc/letsencrypt/live/munin.journalsurf.co.nz/privkey.pem
 	Include /opt/certbot/certbot-apache/certbot_apache/options-ssl-apache.conf
-	SSLCertificateChainFile /etc/letsencrypt/live/{{ ansible_role_munin.hostname }}/chain.pem
+	SSLCertificateChainFile /etc/letsencrypt/live/munin.journalsurf.co.nz/chain.pem
 
 	ErrorLog  /var/log/apache2/{{ ansible_role_munin.hostname }}/error.log
 	CustomLog /var/log/apache2/{{ ansible_role_munin.hostname }}/access.log combined

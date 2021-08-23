@@ -9,6 +9,9 @@
 		Require all granted
 	</Directory>
 
+	ErrorLog  /var/log/apache2/{{ ansible_role_munin.hostname }}/error.log
+	CustomLog /var/log/apache2/{{ ansible_role_munin.hostname }}/access.log combined
+
 	<IfModule mod_rewrite.c>
 		RewriteEngine On
 
@@ -57,9 +60,9 @@
 		AuthName "Munin"
 		AuthType Basic
 		Require valid-user
-		<ifmodule mod_expires.c="">
-				ExpiresActive On
-				ExpiresDefault M310
+		<ifmodule mod_expires.c>
+			ExpiresActive On
+			ExpiresDefault M310
 		</ifmodule>
 	</Directory>
 
@@ -68,7 +71,7 @@
 	</Directory>
 
 	# Note that we also need to define a location block to allow the zoomed-in graphs
-    # be generated as mentioned at http://alexschroeder.ch/wiki/Kallobombus_Munin
+	# be generated as mentioned at http://alexschroeder.ch/wiki/Kallobombus_Munin
 	ScriptAlias /munin-cgi/munin-cgi-graph /usr/lib/munin/cgi/munin-cgi-graph
 	<Location /munin-cgi/munin-cgi-graph>
 		# For Apache 2.2:
@@ -101,6 +104,4 @@
 		</IfModule>
 	</Directory>
 
-	ErrorLog  /var/log/apache2/{{ ansible_role_munin.hostname }}/error.log
-	CustomLog /var/log/apache2/{{ ansible_role_munin.hostname }}/access.log combined
 </VirtualHost>

@@ -22,7 +22,6 @@
   when: scheme == "https"
   tags: apache
 
-
 - name: Create our htpasswd file
   htpasswd: path=/etc/apache2/munin-users
     name={{ ansible_role_munin.user }}
@@ -59,10 +58,10 @@
 
 - name: Rolling back - Removing our virtualhost
   action: command a2dissite munin.apache.conf
-  when: result|failed
+  when: result is failed
   tags: apache
 
 - name: Rolling back - Ending playbook
   action: fail msg="Configuration file is not valid. Please check using 'apache2ctl configtest' before re-running the playbook."
-  when: result|failed
+  when: result is failed
   tags: apache

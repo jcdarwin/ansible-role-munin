@@ -2,9 +2,9 @@
 # handlers file for ansible-role-munin
 
 - name: restart apache
-  sudo: yes
+  become: yes
   service: name=apache2 state=restarted
 
 - name: restart munin-node
-  sudo: yes
+  become: yes
   service: name=munin-node state=restarted
