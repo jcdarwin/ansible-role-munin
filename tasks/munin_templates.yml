@@ -50,6 +50,8 @@
   tags: templates
 
 # /usr/share/munin/munin-html --debug
+# This command may fail for a few minutes until there is runtime data,
+# so simply retry after a minute or two
 - name: Compile the templates
   command: su - munin -s "/usr/share/munin/munin-html"
   tags: templates

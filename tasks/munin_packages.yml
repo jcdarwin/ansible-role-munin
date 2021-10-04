@@ -4,17 +4,17 @@
 # ===============================================================
 
 - name: Install packages
-  apt: pkg={{ item }} state=installed
+  apt: pkg={{ item }} state=latest
   with_items:
     - software-properties-common
-    - python-software-properties
+    - python3-software-properties
     - libcache-perl
     - libcache-cache-perl
     - libwww-perl
-    - python-passlib
+    - python3-passlib
     - libcgi-fast-perl
     - libapache2-mod-fcgid
-    - php7.0-cgi
+    - php7.3-cgi
     - munin
     - munin-node
     - munin-plugins-extra

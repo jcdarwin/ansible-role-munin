@@ -113,7 +113,8 @@
 
 	SSLCertificateFile /etc/letsencrypt/live/munin.journalsurf.co.nz/cert.pem
 	SSLCertificateKeyFile /etc/letsencrypt/live/munin.journalsurf.co.nz/privkey.pem
-	Include /opt/certbot/certbot-apache/certbot_apache/options-ssl-apache.conf
+	# Include /opt/certbot/certbot-apache/certbot_apache/options-ssl-apache.conf
+	Include /etc/letsencrypt/options-ssl-apache.conf
 	SSLCertificateChainFile /etc/letsencrypt/live/munin.journalsurf.co.nz/chain.pem
 
 	ErrorLog  /var/log/apache2/{{ ansible_role_munin.hostname }}/error.log
